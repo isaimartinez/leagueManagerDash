@@ -1,7 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { authProvider, emails } from "@/providers";
-
+import { authProvider } from "@/providers";
+const emails = [
+  "michael.scott@dundermifflin.com",
+  "jim.halpert@dundermifflin.com",
+  "pam.beesly@dundermifflin.com",
+  "dwight.schrute@dundermifflin.com",
+  "angela.martin@dundermifflin.com",
+  "stanley.hudson@dundermifflin.com",
+  "phyllis.smith@dundermifflin.com",
+  "kevin.malone@dundermifflin.com",
+  "oscar.martinez@dundermifflin.com",
+  "creed.bratton@dundermifflin.com",
+  "meredith.palmer@dundermifflin.com",
+  "ryan.howard@dundermifflin.com",
+  "kelly.kapoor@dundermifflin.com",
+  "andy.bernard@dundermifflin.com",
+  "toby.flenderson@dundermifflin.com",
+];
 /**
  * This hook is used to automatically login the user.
  * We use this hook to skip the login page and demonstrate the application more quickly.

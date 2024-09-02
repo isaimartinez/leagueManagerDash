@@ -13,7 +13,7 @@ import routerProvider, {
 import { App as AntdApp, ConfigProvider } from "antd";
 
 import { resources, themeConfig } from "@/config";
-import { authProvider, dataProvider, liveProvider } from "@/providers";
+import { authProvider, dataProvider } from "@/providers";
 
 import { AlgoliaSearchWrapper, FullScreenLoading, Layout } from "./components";
 import { useAutoLoginForDemo } from "./hooks";
@@ -37,6 +37,7 @@ import {
 import { DashboardPage } from "./routes/dashboard";
 import { ForgotPasswordPage } from "./routes/forgot-password";
 import { LoginPage } from "./routes/login";
+import { LandingPage } from "./routes/landingpage"; // Import the LandingPage component
 import {
   QuotesCreatePage,
   QuotesEditPage,
@@ -68,8 +69,6 @@ import "./styles/fc.css";
 import "./styles/index.css";
 
 const App: React.FC = () => {
-  // This hook is used to automatically login the user.
-  // We use this hook to skip the login page and demonstrate the application more quickly.
   const { loading } = useAutoLoginForDemo();
 
   if (loading) {
@@ -85,7 +84,6 @@ const App: React.FC = () => {
               <Refine
                 authProvider={authProvider}
                 dataProvider={dataProvider}
-                liveProvider={liveProvider}
                 routerProvider={routerProvider}
                 resources={resources}
                 notificationProvider={useNotificationProvider}
@@ -96,11 +94,14 @@ const App: React.FC = () => {
                 }}
               >
                 <Routes>
+                  {/* Add the landing page route */}
+                  <Route path="/landing" element={<LandingPage />} />
+                  
                   <Route
                     element={
                       <Authenticated
                         key="authenticated-layout"
-                        fallback={<CatchAllNavigate to="/login" />}
+                        fallback={<CatchAllNavigate to="/landing" />}
                       >
                         <Layout>
                           <Outlet />

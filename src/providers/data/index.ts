@@ -1,47 +1,68 @@
-import graphqlDataProvider, {
-  GraphQLClient,
-  liveProvider as graphqlLiveProvider,
-} from "@refinedev/nestjs-query";
+import axios from 'axios';
+import { DataProvider } from '@refinedev/core';
 
-import { createClient } from "graphql-ws";
+const axiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+});
 
-import { axiosInstance } from "./axios";
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
 
-export const API_BASE_URL = "https://api.crm.refine.dev";
-export const API_URL = `${API_BASE_URL}/graphql`;
-export const WS_URL = "wss://api.crm.refine.dev/graphql";
-
-export const client = new GraphQLClient(API_URL, {
-  fetch: async (url: string, options: any) => {
-    try {
-      const response = await axiosInstance.request({
-        data: options.body,
-        url,
-        ...options,
-      });
-
-      return { ...response, data: response.data };
-    } catch (error: any) {
-      const messages = error?.map((error: any) => error?.message)?.join("");
-      const code = error?.[0]?.extensions?.code;
-
-      return Promise.reject({
-        message: messages || JSON.stringify(error),
-        statusCode: code || 500,
-      });
-    }
+export const dataProvider: DataProvider = {
+  getList: async ({ resource, pagination, filters, sorters }) => {
+    const { data, headers } = await axiosInstance.get(`/${resource}`, {
+      params: { pagination, filters, sorters },
+    });
+    return {
+      data,
+      total: parseInt(headers['x-total-count'] || '0'),
+    };
   },
-});
-
-export const wsClient = createClient({
-  url: WS_URL,
-  connectionParams: () => ({
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-    },
-  }),
-});
-
-export const dataProvider = graphqlDataProvider(client);
-
-export const liveProvider = graphqlLiveProvider(wsClient);
+  getOne: async ({ resource, id }) => {
+    const { data } = await axiosInstance.get(`/${resource}/${id}`);
+    return { data };
+  },
+  create: async ({ resource, variables }) => {
+    const { data } = await axiosInstance.post(`/${resource}`, variables);
+    return { data };
+  },
+  update: async ({ resource, id, variables }) => {
+    const { data } = await axiosInstance.put(`/${resource}/${id}`, variables);
+    return { data };
+  },
+  deleteOne: async ({ resource, id }) => {
+    const { data } = await axiosInstance.delete(`/${resource}/${id}`);
+    return { data };
+  },
+  getMany: async ({ resource, ids }) => {
+    const { data } = await axiosInstance.get(`/${resource}`, { params: { ids } });
+    return { data };
+  },
+  createMany: async ({ resource, variables }) => {
+    const { data } = await axiosInstance.post(`/${resource}/bulk`, variables);
+    return { data };
+  },
+  updateMany: async ({ resource, ids, variables }) => {
+    const { data } = await axiosInstance.put(`/${resource}/bulk`, { ids, ...variables });
+    return { data };
+  },
+  deleteMany: async ({ resource, ids }) => {
+    const { data } = await axiosInstance.delete(`/${resource}/bulk`, { data: { ids } });
+    return { data };
+  },
+  custom: async ({ url, method, filters, sorters, payload, query, headers }) => {
+    const { data } = await axiosInstance.request({
+      url,
+      method,
+      params: { ...filters, ...sorters, ...query },
+      data: payload,
+      headers,
+    });
+    return { data };
+  },
+};
