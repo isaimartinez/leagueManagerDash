@@ -1,68 +1,37 @@
 import React, { lazy, Suspense, useMemo } from "react";
-
-import { useList, useNavigation } from "@refinedev/core";
-import type { GetFieldsFromList } from "@refinedev/nestjs-query";
-
+import { useNavigation } from "@refinedev/core";
 import { DollarOutlined, RightCircleOutlined } from "@ant-design/icons";
 import type { AreaConfig } from "@ant-design/plots";
 import { Button, Card } from "antd";
 import dayjs from "dayjs";
-
 import { Text } from "@/components";
-import type { DashboardDealsChartQuery } from "@/graphql/types";
-
-import { DASHBOARD_DEALS_CHART_QUERY } from "./queries";
 
 const Area = lazy(() => import("@ant-design/plots/es/components/area"));
 
+// Mocked data
+const mockedDealsData = [
+  { closeDateMonth: 1, closeDateYear: 2023, sum: { value: 50000 }, state: "Won" },
+  { closeDateMonth: 2, closeDateYear: 2023, sum: { value: 75000 }, state: "Won" },
+  { closeDateMonth: 3, closeDateYear: 2023, sum: { value: 60000 }, state: "Won" },
+  { closeDateMonth: 1, closeDateYear: 2023, sum: { value: 30000 }, state: "Lost" },
+  { closeDateMonth: 2, closeDateYear: 2023, sum: { value: 45000 }, state: "Lost" },
+  { closeDateMonth: 3, closeDateYear: 2023, sum: { value: 35000 }, state: "Lost" },
+];
+
 export const DashboardDealsChart: React.FC = () => {
   const { list } = useNavigation();
-  const { data, isError, error } = useList<
-    GetFieldsFromList<DashboardDealsChartQuery>
-  >({
-    resource: "dealStages",
-    filters: [{ field: "title", operator: "in", value: ["WON", "LOST"] }],
-    meta: {
-      gqlQuery: DASHBOARD_DEALS_CHART_QUERY,
-    },
-  });
-
-  if (isError) {
-    console.error("Error fetching deals chart data", error);
-    return null;
-  }
 
   const dealData = useMemo(() => {
-    const won = data?.data
-      .find((node) => node.title === "WON")
-      ?.dealsAggregate.map((item) => {
-        const { closeDateMonth, closeDateYear } = item.groupBy!;
-        const date = dayjs(`${closeDateYear}-${closeDateMonth}-01`);
-        return {
-          timeUnix: date.unix(),
-          timeText: date.format("MMM YYYY"),
-          value: item.sum?.value,
-          state: "Won",
-        };
-      });
-
-    const lost = data?.data
-      .find((node) => node.title === "LOST")
-      ?.dealsAggregate.map((item) => {
-        const { closeDateMonth, closeDateYear } = item.groupBy!;
-        const date = dayjs(`${closeDateYear}-${closeDateMonth}-01`);
-        return {
-          timeUnix: date.unix(),
-          timeText: date.format("MMM YYYY"),
-          value: item.sum?.value,
-          state: "Lost",
-        };
-      });
-
-    return [...(won || []), ...(lost || [])].sort(
-      (a, b) => a.timeUnix - b.timeUnix,
-    );
-  }, [data]);
+    return mockedDealsData.map((item) => {
+      const date = dayjs(`${item.closeDateYear}-${item.closeDateMonth}-01`);
+      return {
+        timeUnix: date.unix(),
+        timeText: date.format("MMM YYYY"),
+        value: item.sum.value,
+        state: item.state,
+      };
+    }).sort((a, b) => a.timeUnix - b.timeUnix);
+  }, []);
 
   const config: AreaConfig = {
     isStack: false,
@@ -115,7 +84,6 @@ export const DashboardDealsChart: React.FC = () => {
             gap: "8px",
           }}
         >
-          {/* @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66 */}
           <DollarOutlined />
           <Text size="sm" style={{ marginLeft: ".5rem" }}>
             Deals
@@ -123,13 +91,12 @@ export const DashboardDealsChart: React.FC = () => {
         </div>
       }
       extra={
-        // @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66
         <Button onClick={() => list("deals")} icon={<RightCircleOutlined />}>
           See sales pipeline
         </Button>
       }
     >
-      <Suspense>
+      <Suspense fallback={<div>Loading...</div>}>
         <Area {...config} height={325} />
       </Suspense>
     </Card>

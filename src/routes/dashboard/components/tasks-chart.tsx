@@ -1,53 +1,28 @@
 import React, { lazy, Suspense, useMemo } from "react";
-
-import { useList, useNavigation } from "@refinedev/core";
-import type { GetFieldsFromList } from "@refinedev/nestjs-query";
-
+import { useNavigation } from "@refinedev/core";
 import { ProjectOutlined, RightCircleOutlined } from "@ant-design/icons";
 import type { PieConfig } from "@ant-design/plots";
 import { Button, Card } from "antd";
-
 import { Text } from "@/components";
-import type { DashboardTasksChartQuery } from "@/graphql/types";
-
-import { DASHBOARD_TASKS_CHART_QUERY } from "./queries";
 
 const Pie = lazy(() => import("@ant-design/plots/es/components/pie"));
+
+// Mocked data
+const mockedTasksData = [
+  { title: "To Do", value: 5 },
+  { title: "In Progress", value: 3 },
+  { title: "In Review", value: 2 },
+  { title: "Done", value: 8 },
+];
 
 export const DashboardTasksChart: React.FC = () => {
   const { list } = useNavigation();
 
-  const { data, isError, error } = useList<
-    GetFieldsFromList<DashboardTasksChartQuery>
-  >({
-    resource: "taskStages",
-    pagination: {
-      pageSize: 4,
-    },
-    meta: { gqlQuery: DASHBOARD_TASKS_CHART_QUERY },
-  });
-
-  if (isError) {
-    console.error("Error fetching task chart data", error);
-    return null;
-  }
-
   const tasksData = useMemo(() => {
-    if (!data?.data?.length) {
-      return [];
-    }
-
-    return data.data
-      .map((stage) => ({
-        title: stage.title,
-        value: stage.tasksAggregate?.[0]?.count?.id ?? 0,
-      }))
-      .filter(
-        (stage) =>
-          stage.value !== null && stage.value !== undefined && stage.value > 0,
-      )
-      .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
-  }, [data?.data]);
+    return mockedTasksData
+      .filter((stage) => stage.value > 0)
+      .sort((a, b) => b.value - a.value);
+  }, []);
 
   const COLORS = [
     "#BAE0FF",
@@ -95,7 +70,6 @@ export const DashboardTasksChart: React.FC = () => {
             gap: "8px",
           }}
         >
-          {/* @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66 */}
           <ProjectOutlined />
           <Text size="sm" style={{ marginLeft: ".5rem" }}>
             Tasks
@@ -103,7 +77,6 @@ export const DashboardTasksChart: React.FC = () => {
         </div>
       }
       extra={
-        // @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66
         <Button onClick={() => list("tasks")} icon={<RightCircleOutlined />}>
           See kanban board
         </Button>
@@ -117,7 +90,7 @@ export const DashboardTasksChart: React.FC = () => {
           alignItems: "center",
         }}
       >
-        <Suspense>
+        <Suspense fallback={<div>Loading...</div>}>
           <Pie {...config} />
         </Suspense>
       </div>
@@ -129,7 +102,7 @@ export const DashboardTasksChart: React.FC = () => {
           marginTop: "48px",
         }}
       >
-        {tasksData?.map((item, index) => (
+        {tasksData.map((item, index) => (
           <div
             key={index}
             style={{

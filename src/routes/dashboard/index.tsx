@@ -1,11 +1,8 @@
 import React from "react";
 
-import { useCustom } from "@refinedev/core";
-
 import { Col, Row } from "antd";
 
 import { CalendarUpcomingEvents } from "@/components";
-import type { DashboardTotalCountsQuery } from "@/graphql/types";
 
 import {
   CompaniesMap,
@@ -15,14 +12,10 @@ import {
   DashboardTotalCountCard,
   DashboardTotalRevenueChart,
 } from "./components";
-import { DASHBOARD_TOTAL_COUNTS_QUERY } from "./queries";
 
 export const DashboardPage: React.FC = () => {
-  const { data, isLoading } = useCustom<DashboardTotalCountsQuery>({
-    url: "",
-    method: "get",
-    meta: { gqlQuery: DASHBOARD_TOTAL_COUNTS_QUERY },
-  });
+  const isLoading = false;
+  const data = null
 
   return (
     <div className="page-container">

@@ -1,83 +1,79 @@
-import React, { useState } from "react";
-
-import { useList, useMany } from "@refinedev/core";
-import type { GetFieldsFromList } from "@refinedev/nestjs-query";
+import React, { useState, useMemo } from "react";
 
 import { BellOutlined } from "@ant-design/icons";
 import { Badge, Button, Divider, Popover, Space, Spin } from "antd";
 import dayjs from "dayjs";
 
-import type {
-  NotificationsDealsQuery,
-  NotificationsQuery,
-} from "@/graphql/types";
-
 import { CustomAvatar } from "../custom-avatar";
 import { Text } from "../text";
 import { NotificationMessage } from "./notification-message";
-import { NOTIFICATIONS_DEALS_QUERY, NOTIFICATIONS_QUERY } from "./queries";
+
+// Mocked data
+const mockedNotifications = [
+  {
+    id: 1,
+    createdAt: "2023-04-15T10:30:00Z",
+    action: "CREATE",
+    targetId: 1,
+    targetEntity: "Match",
+    deal: {
+      company: {
+        name: "Team A vs Team B",
+        avatarUrl: "https://example.com/teamA.png"
+      }
+    }
+  },
+  {
+    id: 2,
+    createdAt: "2023-04-14T15:45:00Z",
+    action: "UPDATE",
+    targetId: 2,
+    targetEntity: "Player",
+    deal: {
+      company: {
+        name: "Player Transfer",
+        avatarUrl: "https://example.com/player.png"
+      }
+    }
+  },
+  {
+    id: 3,
+    createdAt: "2023-04-13T09:00:00Z",
+    action: "CREATE",
+    targetId: 3,
+    targetEntity: "Tournament",
+    deal: {
+      company: {
+        name: "Summer League",
+        avatarUrl: "https://example.com/tournament.png"
+      }
+    }
+  }
+];
 
 export const Notifications: React.FC = () => {
   const [open, setOpen] = useState(false);
 
-  const { data, isLoading } = useList<GetFieldsFromList<NotificationsQuery>>({
-    resource: "audits",
-    pagination: {
-      pageSize: 5,
-    },
-    sorters: [{ field: "createdAt", order: "desc" }],
-    filters: [
-      {
-        field: "action",
-        operator: "in",
-        value: ["CREATE", "UPDATE"],
-      },
-      {
-        field: "targetEntity",
-        operator: "eq",
-        value: "Deal",
-      },
-    ],
-    meta: {
-      gqlQuery: NOTIFICATIONS_QUERY,
-    },
-    queryOptions: {
-      enabled: open,
-    },
-  });
-
-  const targetIds = data?.data?.map((audit) => audit.targetId);
-  const { data: dealData } = useMany<
-    GetFieldsFromList<NotificationsDealsQuery>
-  >({
-    resource: "deals",
-    ids: targetIds ?? [],
-    meta: {
-      gqlQuery: NOTIFICATIONS_DEALS_QUERY,
-    },
-    queryOptions: {
-      enabled: Boolean(targetIds?.length),
-    },
-  });
-
-  const getDeal = (id: string | number) => {
-    return dealData?.data?.find((deal) => deal.id === id);
-  };
+  const notificationData = useMemo(() => {
+    return mockedNotifications.sort((a, b) => 
+      dayjs(b.createdAt).unix() - dayjs(a.createdAt).unix()
+    );
+  }, []);
 
   const content = (
     <Space direction="vertical" split={<Divider style={{ margin: 0 }} />}>
-      {data?.data?.map((audit) => (
-        <Space key={audit.id}>
+      {notificationData.map((notification) => (
+        <Space key={notification.id}>
           <CustomAvatar
             size={48}
             shape="square"
-            src={getDeal(audit.targetId)?.company?.avatarUrl}
-            name={getDeal(audit.targetId)?.company?.name}
+            src={notification.deal.company.avatarUrl}
+            name={notification.deal.company.name}
           />
           <Space direction="vertical" size={0}>
-            <NotificationMessage audit={audit} deal={getDeal(audit.targetId)} />
+            <NotificationMessage audit={notification} deal={notification.deal} />
             <Text size="xs" type="secondary">
-              {dayjs(audit?.createdAt).fromNow()}
+              {dayjs(notification.createdAt).fromNow()}
             </Text>
           </Space>
         </Space>
@@ -85,29 +81,15 @@ export const Notifications: React.FC = () => {
     </Space>
   );
 
-  const loadingContent = (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: 20,
-      }}
-    >
-      <Spin />
-    </div>
-  );
-
   return (
     <Popover
       placement="bottomRight"
-      content={isLoading ? loadingContent : content}
+      content={content}
       trigger="click"
       onOpenChange={(newOpen) => setOpen(newOpen)}
       overlayStyle={{ width: 400 }}
     >
       <Badge dot>
-        {/* @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66 */}
         <Button shape="circle" icon={<BellOutlined />} style={{ border: 0 }} />
       </Badge>
     </Popover>

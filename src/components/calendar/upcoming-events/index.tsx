@@ -1,25 +1,58 @@
 import React from "react";
 
-import { useList, useNavigation } from "@refinedev/core";
-import type { GetFieldsFromList } from "@refinedev/nestjs-query";
-
+import { useNavigation } from "@refinedev/core";
 import { CalendarOutlined, RightCircleOutlined } from "@ant-design/icons";
-import type { CardProps } from "antd";
-import { Button, Card, Skeleton as AntdSkeleton } from "antd";
+import { Button, Card } from "antd";
 import dayjs from "dayjs";
-
-import type { UpcomingEventsQuery } from "@/graphql/types";
 
 import { Text } from "../../text";
 import { CalendarUpcomingEvent } from "./event";
 import styles from "./index.module.css";
-import { CALENDAR_UPCOMING_EVENTS_QUERY } from "./queries";
 
 type CalendarUpcomingEventsProps = {
   limit?: number;
-  cardProps?: CardProps;
+  cardProps?: React.ComponentProps<typeof Card>;
   showGoToListButton?: boolean;
 };
+
+// Mocked data for upcoming events
+const mockedEvents = [
+  {
+    id: "1",
+    title: "Team A vs Team B",
+    color: "#1890ff",
+    startDate: dayjs().add(1, 'day').toISOString(),
+    endDate: dayjs().add(1, 'day').add(2, 'hour').toISOString(),
+  },
+  {
+    id: "2",
+    title: "Player Transfer Window Opens",
+    color: "#52c41a",
+    startDate: dayjs().add(3, 'day').toISOString(),
+    endDate: dayjs().add(3, 'day').add(1, 'hour').toISOString(),
+  },
+  {
+    id: "3",
+    title: "League Meeting",
+    color: "#faad14",
+    startDate: dayjs().add(5, 'day').toISOString(),
+    endDate: dayjs().add(5, 'day').add(3, 'hour').toISOString(),
+  },
+  {
+    id: "4",
+    title: "Training Session",
+    color: "#722ed1",
+    startDate: dayjs().add(7, 'day').toISOString(),
+    endDate: dayjs().add(7, 'day').add(2, 'hour').toISOString(),
+  },
+  {
+    id: "5",
+    title: "Charity Event",
+    color: "#eb2f96",
+    startDate: dayjs().add(10, 'day').toISOString(),
+    endDate: dayjs().add(10, 'day').add(4, 'hour').toISOString(),
+  },
+];
 
 const NoEvent: React.FC = () => (
   <span
@@ -34,37 +67,6 @@ const NoEvent: React.FC = () => (
   </span>
 );
 
-const Skeleton: React.FC = () => {
-  return (
-    <div className={styles.item}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          marginLeft: "24px",
-          padding: "1px 0",
-        }}
-      >
-        <AntdSkeleton.Button
-          active
-          style={{
-            height: "14px",
-          }}
-        />
-        <AntdSkeleton.Button
-          active
-          style={{
-            width: "90%",
-            marginTop: "8px",
-            height: "16px",
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
 export const CalendarUpcomingEvents: React.FC<CalendarUpcomingEventsProps> = ({
   limit = 5,
   cardProps,
@@ -72,28 +74,7 @@ export const CalendarUpcomingEvents: React.FC<CalendarUpcomingEventsProps> = ({
 }) => {
   const { list } = useNavigation();
 
-  const { data, isLoading } = useList<GetFieldsFromList<UpcomingEventsQuery>>({
-    resource: "events",
-    pagination: {
-      pageSize: limit,
-    },
-    sorters: [
-      {
-        field: "startDate",
-        order: "asc",
-      },
-    ],
-    filters: [
-      {
-        field: "startDate",
-        operator: "gte",
-        value: dayjs().format("YYYY-MM-DD"),
-      },
-    ],
-    meta: {
-      gqlQuery: CALENDAR_UPCOMING_EVENTS_QUERY,
-    },
-  });
+  const events = mockedEvents.slice(0, limit);
 
   return (
     <Card
@@ -109,7 +90,6 @@ export const CalendarUpcomingEvents: React.FC<CalendarUpcomingEventsProps> = ({
             gap: "8px",
           }}
         >
-          {/* @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66 */}
           <CalendarOutlined />
           <Text size="sm" style={{ marginLeft: ".7rem" }}>
             Upcoming events
@@ -118,7 +98,6 @@ export const CalendarUpcomingEvents: React.FC<CalendarUpcomingEventsProps> = ({
       }
       extra={
         showGoToListButton && (
-          // @ts-expect-error Ant Design Icon's v5.0.1 has an issue with @types/react@^18.2.66
           <Button onClick={() => list("events")} icon={<RightCircleOutlined />}>
             See calendar
           </Button>
@@ -126,15 +105,10 @@ export const CalendarUpcomingEvents: React.FC<CalendarUpcomingEventsProps> = ({
       }
       {...cardProps}
     >
-      {isLoading &&
-        Array.from({ length: limit }).map((_, index) => (
-          <Skeleton key={index} />
-        ))}
-      {!isLoading &&
-        data?.data.map((item) => (
-          <CalendarUpcomingEvent key={item.id} item={item} />
-        ))}
-      {!isLoading && data?.data.length === 0 && <NoEvent />}
+      {events.map((item) => (
+        <CalendarUpcomingEvent key={item.id} item={item} />
+      ))}
+      {events.length === 0 && <NoEvent />}
     </Card>
   );
 };
