@@ -20,7 +20,7 @@ import { COMPANIES_TABLE_QUERY } from "./queries";
 
 type View = "card" | "table";
 
-export const CompanyListPage: FC<PropsWithChildren> = ({ children }) => {
+export const TeamListPage: FC<PropsWithChildren> = ({ children }) => {
   const [view, setView] = useState<View>("card");
   const screens = Grid.useBreakpoint();
 
@@ -38,7 +38,7 @@ export const CompanyListPage: FC<PropsWithChildren> = ({ children }) => {
     HttpError,
     { name: string }
   >({
-    resource: "companies",
+    resource: "teams",
     onSearch: (values) => {
       return [
         {
@@ -145,7 +145,7 @@ export const CompanyListPage: FC<PropsWithChildren> = ({ children }) => {
           },
         }}
         title={
-          <ListTitleButton toPath="companies" buttonText="Add new company" />
+          <ListTitleButton toPath="teams" buttonText="Add new Team" />
         }
       >
         {view === "table" ? (

@@ -24,11 +24,7 @@ import {
   CalendarPageWrapper,
   CalendarShowPage,
 } from "./routes/calendar";
-import {
-  CompanyCreatePage,
-  CompanyEditPage,
-  CompanyListPage,
-} from "./routes/companies";
+
 import {
   ContactCreatePage,
   ContactShowPage,
@@ -62,11 +58,15 @@ import {
 } from "./routes/scrumboard/sales";
 import { UpdatePasswordPage } from "./routes/update-password";
 
+import { DashboardOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+
 import "./utilities/init-dayjs";
 import "@refinedev/antd/dist/reset.css";
 import "./styles/antd.css";
 import "./styles/fc.css";
 import "./styles/index.css";
+
+import { TeamListPage, TeamCreatePage, TeamEditPage } from "./routes/teams";
 
 const App: React.FC = () => {
   const { loading } = useAutoLoginForDemo();
@@ -85,16 +85,43 @@ const App: React.FC = () => {
                 authProvider={authProvider}
                 dataProvider={dataProvider}
                 routerProvider={routerProvider}
-                resources={resources}
-                notificationProvider={useNotificationProvider}
+                resources={[
+                  {
+                    name: "dashboard",
+                    list: "/",
+                    meta: {
+                      label: "Dashboard",
+                      icon: <DashboardOutlined />,
+                    },
+                  },
+                  {
+                    name: "teams",
+                    list: "/teams",
+                    create: "/teams/create",
+                    edit: "/teams/edit/:id",
+                    meta: {
+                      label: "Teams",
+                      icon: <TeamOutlined />,
+                    },
+                  },
+                  {
+                    name: "players",
+                    list: "/players",
+                    create: "/players/create",
+                    edit: "/players/edit/:id",
+                    show: "/players/show/:id",
+                    meta: {
+                      label: "Players",
+                      icon: <UserOutlined />,
+                    },
+                  },
+                ]}
                 options={{
-                  liveMode: "auto",
                   syncWithLocation: true,
                   warnWhenUnsavedChanges: true,
                 }}
               >
                 <Routes>
-                  {/* Add the landing page route */}
                   <Route path="/landing" element={<LandingPage />} />
                   
                   <Route
@@ -110,91 +137,15 @@ const App: React.FC = () => {
                     }
                   >
                     <Route index element={<DashboardPage />} />
+                    
+                    {/* Teams routes (previously Companies) */}
+                    <Route path="/teams" element={<TeamListPage />} />
+                    <Route path="/teams/create" element={<TeamCreatePage />} />
+                    <Route path="/teams/edit/:id" element={<TeamEditPage />} />
+
+                    {/* Players routes (previously Contacts) */}
                     <Route
-                      path="/calendar"
-                      element={
-                        <CalendarPageWrapper>
-                          <Outlet />
-                        </CalendarPageWrapper>
-                      }
-                    >
-                      <Route index element={null} />
-                      <Route path="show/:id" element={<CalendarShowPage />} />
-                      <Route path="edit/:id" element={<CalendarEditPage />} />
-                      <Route path="create" element={<CalendarCreatePage />} />
-                    </Route>
-                    <Route path="/scrumboard" element={<Outlet />}>
-                      <Route
-                        path="kanban"
-                        element={
-                          <KanbanPage>
-                            <Outlet />
-                          </KanbanPage>
-                        }
-                      >
-                        <Route path="create" element={<KanbanCreatePage />} />
-                        <Route path="edit/:id" element={<KanbanEditPage />} />
-                        <Route
-                          path="stages/create"
-                          element={<KanbanCreateStage />}
-                        />
-                        <Route
-                          path="stages/edit/:id"
-                          element={<KanbanEditStage />}
-                        />
-                      </Route>
-                      <Route
-                        path="sales"
-                        element={
-                          <SalesPage>
-                            <Outlet />
-                          </SalesPage>
-                        }
-                      >
-                        <Route
-                          path="create"
-                          element={
-                            <SalesCreatePage>
-                              <Outlet />
-                            </SalesCreatePage>
-                          }
-                        >
-                          <Route
-                            path="company/create"
-                            element={<CompanyCreatePage isOverModal />}
-                          />
-                        </Route>
-                        <Route path="edit/:id" element={<SalesEditPage />} />
-                        <Route
-                          path="stages/create"
-                          element={<SalesCreateStage />}
-                        />
-                        <Route
-                          path="stages/edit/:id"
-                          element={<SalesEditStage />}
-                        />
-                        <Route
-                          path=":id/finalize"
-                          element={<SalesFinalizeDeal />}
-                        />
-                      </Route>
-                    </Route>
-                    <Route
-                      path="/companies"
-                      element={
-                        <CompanyListPage>
-                          <Outlet />
-                        </CompanyListPage>
-                      }
-                    >
-                      <Route path="create" element={<CompanyCreatePage />} />
-                    </Route>
-                    <Route
-                      path="/companies/edit/:id"
-                      element={<CompanyEditPage />}
-                    />
-                    <Route
-                      path="/contacts"
+                      path="/players"
                       element={
                         <ContactsListPage>
                           <Outlet />
@@ -212,56 +163,17 @@ const App: React.FC = () => {
                         }
                       >
                         <Route
-                          path="company-create"
-                          element={<CompanyCreatePage isOverModal />}
+                          path="team-create"
+                          element={<TeamCreatePage isOverModal />}
                         />
                       </Route>
                     </Route>
-                    <Route
-                      path="/quotes"
-                      element={
-                        <QuotesListPage>
-                          <Outlet />
-                        </QuotesListPage>
-                      }
-                    >
-                      <Route
-                        path="create"
-                        element={
-                          <QuotesCreatePage>
-                            <Outlet />
-                          </QuotesCreatePage>
-                        }
-                      >
-                        <Route
-                          path="company-create"
-                          element={<CompanyCreatePage isOverModal />}
-                        />
-                      </Route>
-                      <Route
-                        path="edit/:id"
-                        element={
-                          <QuotesEditPage>
-                            <Outlet />
-                          </QuotesEditPage>
-                        }
-                      >
-                        <Route
-                          path="company-create"
-                          element={<CompanyCreatePage isOverModal />}
-                        />
-                      </Route>
-                    </Route>
-                    <Route
-                      path="/quotes/show/:id"
-                      element={<QuotesShowPage />}
-                    />
-                    <Route path="/administration" element={<Outlet />}>
-                      <Route path="settings" element={<SettingsPage />} />
-                      <Route path="audit-log" element={<AuditLogPage />} />
-                    </Route>
+
+                    {/* Remove other routes that are not needed */}
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
+
+                  {/* Authentication routes */}
                   <Route
                     element={
                       <Authenticated
