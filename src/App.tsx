@@ -91,7 +91,7 @@ const App: React.FC = () => {
                     list: "/",
                     meta: {
                       label: "Dashboard",
-                      icon: <DashboardOutlined />,
+                      icon: <DashboardOutlined style={{ fontSize: '18px' }} />,
                     },
                   },
                   {
@@ -101,7 +101,7 @@ const App: React.FC = () => {
                     edit: "/teams/edit/:id",
                     meta: {
                       label: "Teams",
-                      icon: <TeamOutlined />,
+                      icon: <TeamOutlined style={{ fontSize: '18px' }} />,
                     },
                   },
                   {
@@ -112,7 +112,7 @@ const App: React.FC = () => {
                     show: "/players/show/:id",
                     meta: {
                       label: "Players",
-                      icon: <UserOutlined />,
+                      icon: <UserOutlined style={{ fontSize: '18px' }} />,
                     },
                   },
                 ]}

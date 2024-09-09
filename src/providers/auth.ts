@@ -67,4 +67,8 @@ export const authProvider: AuthProvider = {
     }
     return null;
   },
+  onError: async (error) => {
+    console.error(error);
+    return { error };
+  },
 };
