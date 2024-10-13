@@ -1,6 +1,6 @@
 import React from "react";
 import { Create, useForm, useSelect } from "@refinedev/antd";
-import { Form, Input, InputNumber, Select, Upload, message } from "antd";
+import { Form, Input, Select, Upload, message } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import type { UploadChangeParam } from "antd/es/upload";
 import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
@@ -50,7 +50,7 @@ export const PlayerCreatePage: React.FC = () => {
 
   const uploadButton = (
     <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      {loading ? <LoadingOutlined onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} /> : <PlusOutlined onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} />}
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
@@ -78,18 +78,6 @@ export const PlayerCreatePage: React.FC = () => {
           rules={[{ required: true }]}
         >
           <Select {...teamSelectProps} />
-        </Form.Item>
-        <Form.Item label="Goals" name="goals">
-          <InputNumber />
-        </Form.Item>
-        <Form.Item label="Yellow Cards" name="yellowCards">
-          <InputNumber />
-        </Form.Item>
-        <Form.Item label="Red Cards" name="redCards">
-          <InputNumber />
-        </Form.Item>
-        <Form.Item label="Matches Played" name="matchesPlayed">
-          <InputNumber />
         </Form.Item>
         <Form.Item label="Picture" name="picture">
           <Upload
