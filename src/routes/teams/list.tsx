@@ -8,27 +8,46 @@ import {
   DeleteButton,
   CreateButton,
 } from "@refinedev/antd";
-import { useNavigation } from "@refinedev/core";
+import { useNavigation, useDelete } from "@refinedev/core";
 import { TeamOutlined } from "@ant-design/icons";
-import { Table, Space } from "antd";
+import { Table, Space, message } from "antd";
 
 export const TeamListPage: React.FC = () => {
   const { edit } = useNavigation();
+  const { mutate: mutateDelete } = useDelete();
 
-  const { tableProps, sorter } = useTable({
+  const { tableProps, sorter, tableQueryResult } = useTable({
     syncWithLocation: true,
   });
+
+  const handleDelete = (id: string) => {
+    mutateDelete(
+      {
+        resource: "teams",
+        id,
+      },
+      {
+        onSuccess: () => {
+          message.success("Team deleted successfully");
+          tableQueryResult.refetch();
+        },
+        onError: (error: any) => {
+          message.error(error?.message || "An error occurred while deleting the team");
+        },
+      }
+    );
+  };
 
   return (
     <List
       headerButtons={({ defaultButtons }) => (
         <>
-          {/* {defaultButtons} */}
+          {defaultButtons}
           <CreateButton />
         </>
       )}
     >
-      <Table {...tableProps} rowKey="id">
+      <Table {...tableProps} rowKey="_id">
         <Table.Column
           dataIndex="name"
           title="Team Name"
@@ -58,13 +77,13 @@ export const TeamListPage: React.FC = () => {
               <EditButton
                 hideText
                 size="small"
-                recordItemId={record.id}
-                icon={<TeamOutlined />}
+                recordItemId={record._id}
               />
               <DeleteButton
                 hideText
                 size="small"
-                recordItemId={record.id}
+                recordItemId={record._id}
+                onSuccess={() => handleDelete(record._id)}
               />
             </Space>
           )}
