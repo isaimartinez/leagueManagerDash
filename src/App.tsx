@@ -17,45 +17,11 @@ import { authProvider, dataProvider } from "@/providers";
 
 import { AlgoliaSearchWrapper, FullScreenLoading, Layout } from "./components";
 import { useAutoLoginForDemo } from "./hooks";
-import { AuditLogPage, SettingsPage } from "./routes/administration";
-import {
-  CalendarCreatePage,
-  CalendarEditPage,
-  CalendarPageWrapper,
-  CalendarShowPage,
-} from "./routes/calendar";
-
-import {
-  ContactCreatePage,
-  ContactShowPage,
-  ContactsListPage,
-} from "./routes/contacts";
 import { DashboardPage } from "./routes/dashboard";
 import { ForgotPasswordPage } from "./routes/forgot-password";
 import { LoginPage } from "./routes/login";
-import { LandingPage } from "./routes/landingpage"; // Import the LandingPage component
-import {
-  QuotesCreatePage,
-  QuotesEditPage,
-  QuotesListPage,
-  QuotesShowPage,
-} from "./routes/quotes";
+import { LandingPage } from "./routes/landingpage";
 import { RegisterPage } from "./routes/register";
-import {
-  KanbanCreatePage,
-  KanbanCreateStage,
-  KanbanEditPage,
-  KanbanEditStage,
-  KanbanPage,
-} from "./routes/scrumboard/kanban";
-import {
-  SalesCreatePage,
-  SalesCreateStage,
-  SalesEditPage,
-  SalesEditStage,
-  SalesFinalizeDeal,
-  SalesPage,
-} from "./routes/scrumboard/sales";
 import { UpdatePasswordPage } from "./routes/update-password";
 
 import { DashboardOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
@@ -67,6 +33,7 @@ import "./styles/fc.css";
 import "./styles/index.css";
 
 import { TeamListPage, TeamCreatePage, TeamEditPage } from "./routes/teams";
+import { PlayerListPage, PlayerCreatePage, PlayerEditPage, PlayerShowPage } from "./routes/players";
 
 const App: React.FC = () => {
   const { loading } = useAutoLoginForDemo();
@@ -91,7 +58,7 @@ const App: React.FC = () => {
                     list: "/",
                     meta: {
                       label: "Dashboard",
-                      icon: <DashboardOutlined style={{ fontSize: '18px' }} />,
+                      icon: <DashboardOutlined />,
                     },
                   },
                   {
@@ -101,7 +68,7 @@ const App: React.FC = () => {
                     edit: "/teams/edit/:id",
                     meta: {
                       label: "Teams",
-                      icon: <TeamOutlined style={{ fontSize: '18px' }} />,
+                      icon: <TeamOutlined />,
                     },
                   },
                   {
@@ -112,7 +79,7 @@ const App: React.FC = () => {
                     show: "/players/show/:id",
                     meta: {
                       label: "Players",
-                      icon: <UserOutlined style={{ fontSize: '18px' }} />,
+                      icon: <UserOutlined />,
                     },
                   },
                 ]}
@@ -123,7 +90,6 @@ const App: React.FC = () => {
               >
                 <Routes>
                   <Route path="/landing" element={<LandingPage />} />
-                  
                   <Route
                     element={
                       <Authenticated
@@ -137,43 +103,15 @@ const App: React.FC = () => {
                     }
                   >
                     <Route index element={<DashboardPage />} />
-                    
-                    {/* Teams routes (previously Companies) */}
                     <Route path="/teams" element={<TeamListPage />} />
                     <Route path="/teams/create" element={<TeamCreatePage />} />
                     <Route path="/teams/edit/:id" element={<TeamEditPage />} />
-
-                    {/* Players routes (previously Contacts) */}
-                    <Route
-                      path="/players"
-                      element={
-                        <ContactsListPage>
-                          <Outlet />
-                        </ContactsListPage>
-                      }
-                    >
-                      <Route index element={null} />
-                      <Route path="show/:id" element={<ContactShowPage />} />
-                      <Route
-                        path="create"
-                        element={
-                          <ContactCreatePage>
-                            <Outlet />
-                          </ContactCreatePage>
-                        }
-                      >
-                        <Route
-                          path="team-create"
-                          element={<TeamCreatePage isOverModal />}
-                        />
-                      </Route>
-                    </Route>
-
-                    {/* Remove other routes that are not needed */}
+                    <Route path="/players" element={<PlayerListPage />} />
+                    <Route path="/players/create" element={<PlayerCreatePage />} />
+                    <Route path="/players/edit/:id" element={<PlayerEditPage />} />
+                    <Route path="/players/show/:id" element={<PlayerShowPage />} />
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
-
-                  {/* Authentication routes */}
                   <Route
                     element={
                       <Authenticated
@@ -186,14 +124,8 @@ const App: React.FC = () => {
                   >
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
-                    <Route
-                      path="/forgot-password"
-                      element={<ForgotPasswordPage />}
-                    />
-                    <Route
-                      path="/update-password"
-                      element={<UpdatePasswordPage />}
-                    />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/update-password" element={<UpdatePasswordPage />} />
                   </Route>
                 </Routes>
                 <UnsavedChangesNotifier />

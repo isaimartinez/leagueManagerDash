@@ -6,14 +6,14 @@ import {
   DateField,
   EditButton,
   DeleteButton,
-  CreateButton,
+  ShowButton,
 } from "@refinedev/antd";
 import { useNavigation, useDelete } from "@refinedev/core";
-import { TeamOutlined } from "@ant-design/icons";
 import { Table, Space, message, Avatar } from "antd";
+import { UserOutlined } from "@ant-design/icons";
 
-export const TeamListPage: React.FC = () => {
-  const { edit } = useNavigation();
+export const PlayerListPage: React.FC = () => {
+  const { show, edit } = useNavigation();
   const { mutate: mutateDelete } = useDelete();
 
   const { tableProps, sorter, tableQueryResult } = useTable({
@@ -23,59 +23,49 @@ export const TeamListPage: React.FC = () => {
   const handleDelete = (id: string) => {
     mutateDelete(
       {
-        resource: "teams",
+        resource: "players",
         id,
       },
       {
         onSuccess: () => {
-          message.success("Team deleted successfully");
+          message.success("Player deleted successfully");
           tableQueryResult.refetch();
         },
         onError: (error: any) => {
-          message.error(error?.message || "An error occurred while deleting the team");
+          message.error(error?.message || "An error occurred while deleting the player");
         },
       }
     );
   };
 
   return (
-    <List
-      headerButtons={({ defaultButtons }) => (
-        <>
-          {defaultButtons}
-          {/* <CreateButton /> */}
-        </>
-      )}
-    >
+    <List>
       <Table {...tableProps} rowKey="_id">
         <Table.Column
-          dataIndex="logo"
-          title="Logo"
-          render={(logo: string) => (
+          dataIndex="picture"
+          title="Picture"
+          render={(picture: string) => (
             <Avatar
-              src={logo}
-              shape="square"
+              src={picture}
               size={64}
-              icon={<TeamOutlined />}
+              icon={<UserOutlined />}
             />
           )}
         />
         <Table.Column
           dataIndex="name"
-          title="Team Name"
+          title="Player Name"
           sorter
           defaultSortOrder={getDefaultSortOrder("name", sorter)}
         />
         <Table.Column
-          dataIndex={["activeLeagueId", "name"]}
-          title="Active League"
+          dataIndex={["team", "name"]}
+          title="Team"
         />
-        <Table.Column
-          dataIndex="foundationYear"
-          title="Foundation Year"
-          sorter
-        />
-        <Table.Column dataIndex="stadium" title="Stadium" />
+        <Table.Column dataIndex="goals" title="Goals" sorter />
+        <Table.Column dataIndex="yellowCards" title="Yellow Cards" />
+        <Table.Column dataIndex="redCards" title="Red Cards" />
+        <Table.Column dataIndex="matchesPlayed" title="Matches Played" sorter />
         <Table.Column
           dataIndex="createdAt"
           title="Created At"
@@ -86,6 +76,11 @@ export const TeamListPage: React.FC = () => {
           dataIndex="actions"
           render={(_: any, record: any) => (
             <Space>
+              <ShowButton
+                hideText
+                size="small"
+                recordItemId={record._id}
+              />
               <EditButton
                 hideText
                 size="small"
