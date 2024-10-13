@@ -56,7 +56,7 @@ export const TeamListPage: React.FC = () => {
               src={logo}
               shape="square"
               size={64}
-              icon={<TeamOutlined />}
+              icon={<TeamOutlined onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} />}
             />
           )}
         />
@@ -70,12 +70,7 @@ export const TeamListPage: React.FC = () => {
           dataIndex={["activeLeagueId", "name"]}
           title="Active League"
         />
-        <Table.Column
-          dataIndex="foundationYear"
-          title="Foundation Year"
-          sorter
-        />
-        <Table.Column dataIndex="stadium" title="Stadium" />
+        <Table.Column dataIndex="location" title="Location" />
         <Table.Column
           dataIndex="createdAt"
           title="Created At"

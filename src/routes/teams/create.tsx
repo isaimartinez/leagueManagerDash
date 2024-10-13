@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Create, useForm, useSelect } from "@refinedev/antd";
-import { Form, Input, InputNumber, Select, Upload, message } from "antd";
+import { Form, Input, Select, Upload, message } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import type { UploadChangeParam } from "antd/es/upload";
 import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
@@ -41,7 +41,6 @@ export const TeamCreatePage: React.FC = () => {
       return;
     }
     if (info.file.status === "done") {
-      // Get this url from response in real world.
       getBase64(info.file.originFileObj as RcFile, (url) => {
         setLoading(false);
         setImageUrl(url);
@@ -51,7 +50,7 @@ export const TeamCreatePage: React.FC = () => {
 
   const uploadButton = (
     <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      {loading ? <LoadingOutlined onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} /> : <PlusOutlined onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} />}
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
@@ -76,10 +75,10 @@ export const TeamCreatePage: React.FC = () => {
         <Form.Item
           label="Active League"
           name="activeLeagueId"
-          rules={[{ required: true }]}
         >
           <Select
             {...leagueSelectProps}
+            allowClear
             options={leagueSelectProps.options?.map((option) => ({
               value: option.value,
               label: option.label,
@@ -108,10 +107,7 @@ export const TeamCreatePage: React.FC = () => {
             {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
           </Upload>
         </Form.Item>
-        <Form.Item label="Foundation Year" name="foundationYear">
-          <InputNumber />
-        </Form.Item>
-        <Form.Item label="Stadium" name="stadium">
+        <Form.Item label="Location" name="location">
           <Input />
         </Form.Item>
       </Form>
