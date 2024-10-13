@@ -34,6 +34,7 @@ import "./styles/index.css";
 
 import { TeamListPage, TeamCreatePage, TeamEditPage } from "./routes/teams";
 import { PlayerListPage, PlayerCreatePage, PlayerEditPage, PlayerShowPage } from "./routes/players";
+import { LeaguesListPage, LeaguesCreatePage, LeaguesEditPage } from "./routes/leagues";
 
 const App: React.FC = () => {
   const { loading } = useAutoLoginForDemo();
@@ -82,6 +83,16 @@ const App: React.FC = () => {
                       icon: <UserOutlined />,
                     },
                   },
+                  {
+                    name: "leagues",
+                    list: "/leagues",
+                    create: "/leagues/create",
+                    edit: "/leagues/edit/:id",
+                    meta: {
+                      label: "Leagues",
+                      icon: <TeamOutlined />,
+                    },
+                  },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -110,6 +121,9 @@ const App: React.FC = () => {
                     <Route path="/players/create" element={<PlayerCreatePage />} />
                     <Route path="/players/edit/:id" element={<PlayerEditPage />} />
                     <Route path="/players/show/:id" element={<PlayerShowPage />} />
+                    <Route path="/leagues" element={<LeaguesListPage />} />
+                    <Route path="/leagues/create" element={<LeaguesCreatePage />} />
+                    <Route path="/leagues/edit/:id" element={<LeaguesEditPage />} />
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
                   <Route
